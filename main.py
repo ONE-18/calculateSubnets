@@ -29,7 +29,7 @@ def read_ip2(str):
         retur += i + '.'
     return retur[:-1]
 
-def Is_dec(str):
+def getType(str):
     if str[0] == '/':
         return 1
     str = str.split('.')
@@ -59,27 +59,34 @@ def mascarar(dec):
     return ret[:-1]
     
 def tratar(file_path):
-    os.system('cls' if os.name == 'nt' else 'clear')
     save = ''
     with open(file_path, 'r') as file:
+        os.system('cls' if os.name == 'nt' else 'clear')
         content = file.read().split('\n')
         lines = []
         for line in content:
             if line != '': lines.append(line)
         for line in lines:
             line = ''.join(line.split()).split('-')
-            tipo = Is_dec(line[0])
+            if len(line) > 2:
+                tipo = getType(line[2])
+            else:
+                tipo = getType(line[0])
             out = ''
             if tipo == 1:
-                mask = mascarar(int(line[0][1:]))
-                out = '{:>5}\t-\t {:<35} \t-\t{:<16}'.format(line[0], mask, read_ip2(mask))
+                if len(line) > 2:
+                    mask = mascarar(int(line[2][1:]))
+                    out = '{:<35} \t-\t{:^35}\t-\t{}'.format(mask, read_ip2(mask), line[2])
+                else:
+                    mask = mascarar(int(line[0][1:]))
+                    out = '{:<35} \t-\t{:^35}\t-\t{}'.format(mask, read_ip2(mask), line[0])
             elif tipo == 10:
                 ip_trs = read_ip10(line[0])
-                out = '{:>16}\t-\t {:<35}'.format(line[0], ip_trs)
+                out = '{:^35} \t-\t{:<35}'.format(line[0], ip_trs)
             elif tipo == 2:
                 line[0] = normalize(line[0])
                 ip_trs = read_ip2(line[0])
-                out = '{:<35} \t-\t{:>16}'.format(line[0], ip_trs)
+                out = '{:<35} \t-\t{:^35}'.format(line[0], ip_trs)
             elif tipo == 0:
                 print('Error 0')
             else:
