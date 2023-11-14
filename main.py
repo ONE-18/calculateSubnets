@@ -61,7 +61,8 @@ def mascarar(dec):
 def tratar(file_path):
     save = ''
     with open(file_path, 'r') as file:
-        os.system('cls' if os.name == 'nt' else 'clear')
+        # os.system('cls' if os.name == 'nt' else 'clear')
+        # print('Watching file: ' + file_path)
         content = file.read().split('\n')
         lines = []
         for line in content:
@@ -94,7 +95,7 @@ def tratar(file_path):
             
             if tipo > 0:
                 save += out + '\n'
-                print(out)
+                # print(out)
     save = save[:-1]
     write_file(file_path, save)
 
@@ -117,4 +118,6 @@ def write_file(file_path, content):
 
 if __name__ == "__main__":
     file_path = 'file.txt'
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print('Watching file: ' + file_path)
     watch_file(file_path)
