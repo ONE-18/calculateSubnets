@@ -30,6 +30,8 @@ def read_ip2(str):
     return retur[:-1]
 
 def Is_dec(str):
+    if str[0] == '/':
+        return 1
     str = str.split('.')
     if len(str[0]) == 3:
         return 10
@@ -44,6 +46,18 @@ def normalize(str):
         num[i] = num[i].zfill(8)
     return '.'.join(num)
 
+def mascarar(dec):
+    ret = ''
+    for i in range(32):
+        if i < dec:
+            ret += '1'
+        else:
+            ret += '0'
+        if i % 8 == 7:
+            ret += '.'
+
+    return ret[:-1]
+    
 def tratar(file_path):
     os.system('cls' if os.name == 'nt' else 'clear')
     save = ''
@@ -56,7 +70,10 @@ def tratar(file_path):
             line = ''.join(line.split()).split('-')
             tipo = Is_dec(line[0])
             out = ''
-            if tipo == 10:
+            if tipo == 1:
+                mask = mascarar(int(line[0][1:]))
+                out = '{:>5}\t-\t {:<35} \t-\t{:<16}'.format(line[0], mask, read_ip2(mask))
+            elif tipo == 10:
                 ip_trs = read_ip10(line[0])
                 out = '{:>16}\t-\t {:<35}'.format(line[0], ip_trs)
             elif tipo == 2:
