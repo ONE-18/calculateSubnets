@@ -32,6 +32,8 @@ def read_ip2(str):
 def getType(str):
     if str[0] == '/':
         return 1
+    elif str[0] == '_':
+        return 3
     str = str.split('.')
     if len(str[0]) == 3:
         return 10
@@ -57,7 +59,17 @@ def mascarar(dec):
             ret += '.'
 
     return ret[:-1]
-    
+
+def points(str):
+    ret = ''
+    n = str.count('.')
+    if n == 0:
+        segmentos = [str[i:i+8] for i in range(0, len(str), 8)]
+        ret = '.'.join(segmentos)
+    else:
+        ret = str.replace('.', '')
+    return ret
+
 def tratar(file_path):
     save = ''
     with open(file_path, 'r') as file:
@@ -66,7 +78,8 @@ def tratar(file_path):
         content = file.read().split('\n')
         lines = []
         for line in content:
-            if line != '': lines.append(line)
+            if line != '': 
+                lines.append(line)
         for line in lines:
             line = ''.join(line.split()).split('-')
             if len(line) > 2:
@@ -81,6 +94,10 @@ def tratar(file_path):
                 else:
                     mask = mascarar(int(line[0][1:]))
                     out = '{:<35} \t-\t{:^35}\t-\t{}'.format(mask, read_ip2(mask), line[0])
+            elif tipo == 3:
+                n = int(line[0][1:])
+                mask = '0'*n + '1' + '0'*(31-n)
+                out = '{:^35} \t-\t{:<35}'.format(line[0], points(mask))
             elif tipo == 10:
                 ip_trs = read_ip10(line[0])
                 out = '{:^35} \t-\t{:<35}'.format(line[0], ip_trs)
@@ -95,7 +112,6 @@ def tratar(file_path):
             
             if tipo > 0:
                 save += out + '\n'
-                # print(out)
     save = save[:-1]
     write_file(file_path, save)
 
