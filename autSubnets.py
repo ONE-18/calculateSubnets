@@ -128,7 +128,7 @@ def getIPs(ip, mask):
 def calcSubMasks(nSubRedes):
     ret = []
     for i in range(len(nSubRedes)):
-        nDisp = int(nSubRedes[i])+2
+        nDisp = nSubRedes[i]+2
         ret.append(32-math.ceil(math.log2(nDisp)))
     return ret
         
@@ -140,16 +140,22 @@ def readTxt():
         with open('input.txt', "r") as archivo:
             content = archivo.read().split('\n')
             for i in range(len(content)):
-                if i == 0 and content[i].count('/') == 1:
-                    line = content[i].split('/')
-                    ip = line[0]
-                    Mask = line[1]
+                if i == 0:
+                    if content[i].count('/') == 1:
+                        line = content[i].split('/')
+                        ip = line[0]
+                        Mask = line[1]
+                    else:
+                        print('Error en la primera linea del archivo')
+                        exit()
                 else:
                     nSubRedes.append(content[i])
+            nSubRedes = list(map(int,nSubRedes))
+            nSubRedes.sort(reverse=True)
             imprimir('IP inicial: ' + ip)
             imprimir('Mascara: ' + Mask)
             imprimir('Numero de subredes: ' + str(len(nSubRedes)))
-            nDisp = sum([int(i)+2 for i in nSubRedes])
+            nDisp = sum([i+2 for i in nSubRedes])
             imprimir('Numero de dispositivos totales: ' + str(nDisp))
             if(nDisp > 2**(32-int(Mask))):
                 imprimir('Error, demasiados dispositivos para esta mascara')
