@@ -135,5 +135,8 @@ def write_file(file_path, content):
 if __name__ == "__main__":
     file_path = 'file.txt'
     os.system('cls' if os.name == 'nt' else 'clear')
+    if not os.path.isfile(file_path):
+        with open(file_path, 'w') as file:
+            file.write('')
     print('Watching file: ' + file_path)
     watch_file(file_path)

@@ -167,11 +167,10 @@ def readTxt():
                     
                     newIP = sumAt(IPb, maskDec(MaskBin))
                     ip = read_ip2(points(newIP))
-                    
-            
-                
     except FileNotFoundError:
         imprimir('No se encontro el archivo')
+        with open('input.txt', "w") as archivo:
+            archivo.write('')
         exit()
     
 if __name__ == "__main__":
