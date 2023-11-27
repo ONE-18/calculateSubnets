@@ -58,7 +58,7 @@ def sumAt(b, n):
     sumando = '0'*n + '1' + '0'*(31-n)
     
     ret = ''
-    accarreo = 0
+    acarreo = 0
     
     for bit1, bit2 in zip(reversed(b), reversed(sumando)):
         suma_bits = int(bit1) + int(bit2) + acarreo
@@ -68,7 +68,7 @@ def sumAt(b, n):
         # Agregar el bit al principio del resultado
         resultado = str(resultado_bit) + resultado
     
-    if accarreo == 1:
+    if acarreo == 1:
         return -1
     else:
         return ret
