@@ -55,6 +55,20 @@ def mascarar(dec):
 def maskDec(mask):
     return mask.count('1')
 
+def aplicarMask(ip_bin, mask_bin):
+    ret = ''
+    
+    if(len(ip_bin) != len(mask_bin)):
+        print('Error, las cadenas no tienen la misma longitud')
+        exit()
+    
+    for i in range(len(ip_bin)):
+        if mask_bin[i] == '1':
+            ret += ip_bin[i]
+        else:
+            ret += '0'
+    return ret
+
 def points(str):
     ret = ''
     n = str.count('.')
@@ -131,7 +145,13 @@ def calcSubMasks(nSubRedes):
         nDisp = nSubRedes[i]+2
         ret.append(32-math.ceil(math.log2(nDisp)))
     return ret
-        
+    
+# TODO: calcular maximo de dispositivos para una una mascara y todas las menores
+def calcularMaxDisp(mask):
+    max = 0
+    for i in range(mask, 33):
+        max += 2**(32-i) - 2    
+    return max 
 
 def readTxt():
     global ip, Mask
@@ -152,27 +172,31 @@ def readTxt():
                     nSubRedes.append(content[i])
             nSubRedes = list(map(int,nSubRedes))
             nSubRedes.sort(reverse=True)
+            maskBin = mascarar(int(Mask))
+            ip_bin = aplicarMask(points(read_ip10(ip)), points(maskBin))
+            ip = read_ip2(points(ip_bin))
             imprimir('IP inicial: ' + ip)
             imprimir('Mascara: ' + Mask)
             imprimir('Numero de subredes: ' + str(len(nSubRedes)))
             nDisp = sum([i+2 for i in nSubRedes])
             imprimir('Numero de dispositivos totales: ' + str(nDisp))
-            if(nDisp > 2**(32-int(Mask))):
-                imprimir('Error, demasiados dispositivos para esta mascara')
-                exit()
-            else:
-                subMasks = calcSubMasks(nSubRedes)
-                for mask in subMasks:
-                    IPb = read_ip10(ip)
-                    MaskBin = mascarar(int(mask))
-                        
-                    imprimir('{:<30}{}/{}'.format('\nIP red:', dobleIP(IPb), mask))
-                    imprimir('{:<30}{}'.format('Mascara red:', dobleIP(MaskBin)))
+            # if(nDisp > calcularMaxDisp(int(Mask))):
+            #     imprimir('Error, demasiados dispositivos para esta mascara')
+            #     exit()
+            # else:
+                # imprimir('Max:' + str(calcularMaxDisp(int(Mask))))
+            subMasks = calcSubMasks(nSubRedes)
+            for mask in subMasks:
+                IPb = read_ip10(ip)
+                MaskBin = mascarar(int(mask))
                     
-                    getIPs(IPb, MaskBin)
-                    
-                    newIP = sumAt(IPb, maskDec(MaskBin))
-                    ip = read_ip2(points(newIP))
+                imprimir('{:<30}{}/{}'.format('\nIP red:', dobleIP(IPb), mask))
+                imprimir('{:<30}{}'.format('Mascara red:', dobleIP(MaskBin)))
+                
+                getIPs(IPb, MaskBin)
+                
+                newIP = sumAt(IPb, maskDec(MaskBin))
+                ip = read_ip2(points(newIP))
     except FileNotFoundError:
         imprimir('No se encontro el archivo')
         with open('input.txt', "w") as archivo:
@@ -197,7 +221,11 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         imprimir('\nStopped by user')
     
-    fecha_hora_actual = datetime.now()
-    cadena_fecha_hora = fecha_hora_actual.strftime("%Y-%m-%d_%H.%M.%S")
-    with open('salida_'+cadena_fecha_hora+'.txt', "w") as archivo:
-        archivo.write(output)
+    if(input('\nGuardar en archivo? (y/n): ') == 'y'):
+        fecha_hora_actual = datetime.now()
+        cadena_fecha_hora = fecha_hora_actual.strftime("%Y-%m-%d_%H.%M.%S")
+        with open('salida_'+cadena_fecha_hora+'.txt', "w") as archivo:
+            archivo.write(output)
+        print('Archivo guardado')
+    else:
+        print('Proceso finalizado')
