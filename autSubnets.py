@@ -171,7 +171,10 @@ def readTxt():
                 else:
                     nSubRedes.append(content[i])
             nSubRedes = list(map(int,nSubRedes))
-            nSubRedes.sort(reverse=True)
+            if(input('Ordenar subredes descendientemente? (y/n): ') == 'y'):
+                nSubRedes.sort(reverse=True)
+            else:
+                nSubRedes.sort(reverse=False)
             maskBin = mascarar(int(Mask))
             ip_bin = aplicarMask(points(read_ip10(ip)), points(maskBin))
             ip = read_ip2(points(ip_bin))
