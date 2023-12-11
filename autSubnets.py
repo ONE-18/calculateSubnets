@@ -1,12 +1,15 @@
 import math
 import os
 from datetime import datetime
+import ipaddress
 
 output = ''
 
 ip = ''
 Mask = ''
 subMask = ''
+
+lista_subredes = []
 
 def imprimir(str):
     global output
@@ -183,21 +186,14 @@ def readTxt():
             imprimir('Numero de subredes: ' + str(len(nSubRedes)))
             nDisp = sum([i+2 for i in nSubRedes])
             imprimir('Numero de dispositivos totales: ' + str(nDisp))
-            # if(nDisp > calcularMaxDisp(int(Mask))):
-            #     imprimir('Error, demasiados dispositivos para esta mascara')
-            #     exit()
-            # else:
-                # imprimir('Max:' + str(calcularMaxDisp(int(Mask))))
             subMasks = calcSubMasks(nSubRedes)
             for mask in subMasks:
                 IPb = read_ip10(ip)
                 MaskBin = mascarar(int(mask))
-                    
+                lista_subredes.append([IPb, int(mask)])
                 imprimir('{:<30}{}/{}'.format('\nIP red:', dobleIP(IPb), mask))
                 imprimir('{:<30}{}'.format('Mascara red:', dobleIP(MaskBin)))
-                
                 getIPs(IPb, MaskBin)
-                
                 newIP = sumAt(IPb, maskDec(MaskBin))
                 ip = read_ip2(points(newIP))
     except FileNotFoundError:
@@ -205,7 +201,26 @@ def readTxt():
         with open('input.txt', "w") as archivo:
             archivo.write('')
         exit()
+
+def getTodasIPs(ip, mask):
+    red = ipaddress.IPv4Network(f'{ip}/{mask}',strict=False)
+    return [str(ip) for ip in red]
     
+def comprobar_rangos(lista):
+    ret = True
+    ips_usadas = []
+    for subred in lista:
+        ip = read_ip2(subred[0])
+        mask = subred[1]
+        ips_red = getTodasIPs(ip, mask)
+        for ip in ips_red:
+            if ips_usadas.count(ip) > 0:
+                imprimir(f'Error, la IP {ip} ya esta en uso')
+                ret = False
+            else:
+                ips_usadas.append(ip)
+    return ret
+
 if __name__ == "__main__":
     try:
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -221,6 +236,9 @@ if __name__ == "__main__":
                 mascaraRed = mascarar(int(Mask))
                 while True:
                     subNet()
+        if not comprobar_rangos(lista_subredes):
+            print('Error en los rangos de las subredes')
+            exit()
     except KeyboardInterrupt:
         imprimir('\nStopped by user')
     
