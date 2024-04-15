@@ -148,7 +148,15 @@ def calcSubMasks(nSubRedes):
         nDisp = nSubRedes[i]+2
         ret.append(32-math.ceil(math.log2(nDisp)))
     return ret
-    
+
+def getAllPossibleIPs(ip, mask):
+    ret = []
+    red = ipaddress.IPv4Network(f'{ip}/{mask}', strict=False)
+    ret = list(map(str, red.hosts()))
+    ret.insert(0, ip   )
+    ret.append(str(red.broadcast_address))
+    return ret
+
 # TODO: calcular maximo de dispositivos para una una mascara y todas las menores
 def calcularMaxDisp(mask):
     max = 0
@@ -201,18 +209,14 @@ def readTxt():
         with open('input.txt', "w") as archivo:
             archivo.write('')
         exit()
-
-def getTodasIPs(ip, mask):
-    red = ipaddress.IPv4Network(f'{ip}/{mask}',strict=False)
-    return [str(ip) for ip in red]
-    
+   
 def comprobar_rangos(lista):
     ret = True
     ips_usadas = []
     for subred in lista:
         ip = read_ip2(subred[0])
         mask = subred[1]
-        ips_red = getTodasIPs(ip, mask)
+        ips_red = getAllPossibleIPs(ip, mask)
         for ip in ips_red:
             if ips_usadas.count(ip) > 0:
                 imprimir(f'Error, la IP {ip} ya esta en uso')
@@ -221,26 +225,22 @@ def comprobar_rangos(lista):
                 ips_usadas.append(ip)
     return ret
 
-if __name__ == "__main__":
-    try:
-        os.system('cls' if os.name == 'nt' else 'clear')
-        leerTxt = input('Leer de archivo? (y/n): ')
-        if leerTxt == 'y':
-            readTxt()
-        else:
-            if ip == '':
-                ip = input('IP inicial: ')
-            if Mask == '':
-                Mask = input('Mascara primera subred: ')
-                IPred = read_ip10(ip)
-                mascaraRed = mascarar(int(Mask))
-                while True:
-                    subNet()
-        if not comprobar_rangos(lista_subredes):
-            print('Error en los rangos de las subredes')
-            exit()
-    except KeyboardInterrupt:
-        imprimir('\nStopped by user')
+def hacerSubRedes():
+    global ip, Mask, subMask, lista_subredes
+    
+    leerTxt = input('Leer de archivo? (y/n): ')
+    if leerTxt == 'y':
+        readTxt()
+    else:
+        if ip == '':
+            ip = input('IP inicial: ')
+        if Mask == '':
+            Mask = input('Mascara primera subred: ')
+            while True:
+                subNet()
+    if not comprobar_rangos(lista_subredes):
+        print('Error en los rangos de las subredes')
+        exit()
     
     if(input('\nGuardar en archivo? (y/n): ') == 'y'):
         fecha_hora_actual = datetime.now()
@@ -250,3 +250,26 @@ if __name__ == "__main__":
         print('Archivo guardado')
     else:
         print('Proceso finalizado')
+    
+if __name__ == "__main__":
+    try:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        if(input('Generar subredes? (y/n): ') == 'y'):
+            hacerSubRedes()
+        if(input('Generar todas las posibles IPs? (y/n): ') == 'y'):
+            ip = input('IP inicial: ')
+            mask = input('Mascara: ')
+            ips = getAllPossibleIPs(ip, mask)
+            imprimir('\n' + '\n'.join(ips))
+            imprimir(f'\nTotal de IPs: {len(ips)}')
+    except KeyboardInterrupt:
+        imprimir('\nStopped by user')
+    
+    # if(input('\nGuardar en archivo? (y/n): ') == 'y'):
+    #     fecha_hora_actual = datetime.now()
+    #     cadena_fecha_hora = fecha_hora_actual.strftime("%Y-%m-%d_%H.%M.%S")
+    #     with open('salida_'+cadena_fecha_hora+'.txt', "w") as archivo:
+    #         archivo.write(output)
+    #     print('Archivo guardado')
+    # else:
+    #     print('Proceso finalizado')
